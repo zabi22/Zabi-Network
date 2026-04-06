@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zabi Network — AI Vision Platform</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0a0c10;--card:#131620;--border:#1e2235;--accent:#7c3aed;--accent2:#06b6d4;--green:#10b981;--red:#f43f5e;--yellow:#f59e0b;--text:#f1f5f9;--muted:#64748b;--font:'Inter','Segoe UI',system-ui,-apple-system,sans-serif}
+body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:100vh}
+.header{background:linear-gradient(135deg,#131620 0%,#1a1f2e 100%);border-bottom:1px solid var(--border);padding:24px 36px;display:flex;align-items:center;justify-content:space-between}
+.header-left{display:flex;align-items:center;gap:16px}
+.header h1{font-size:26px;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:-0.5px}
+.header .badge{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-size:11px;padding:4px 12px;border-radius:20px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px}
+.container{max-width:1500px;margin:0 auto;padding:28px}
+.grid{display:grid;grid-template-columns:360px 1fr;gap:24px}
+@media(max-width:900px){.grid{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:20px;box-shadow:0 4px 20px rgba(0,0,0,.3)}
+.card h2{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.card h2::before{content:'';width:3px;height:16px;background:linear-gradient(180deg,var(--accent),var(--accent2));border-radius:2px}
+label{display:block;font-size:11px;font-weight:600;color:var(--muted);margin-bottom:5px;margin-top:12px;text-transform:uppercase;letter-spacing:0.5px}
+input,select{width:100%;padding:10px 14px;background:#1a1f2e;border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:13px;outline:none;transition:all .2s;font-family:var(--font)}
+input:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(124,58,237,.15)}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.btn{padding:12px 24px;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:8px;justify-content:center;text-transform:uppercase;letter-spacing:0.5px}
+.btn-primary{background:linear-gradient(135deg,var(--accent),#9333ea);color:#fff;width:100%;margin-top:18px;box-shadow:0 4px 15px rgba(124,58,237,.3)}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(124,58,237,.4)}
+.btn-danger{background:linear-gradient(135deg,var(--red),#e11d48);color:#fff;width:100%;margin-top:10px;box-shadow:0 4px 15px rgba(244,63,94,.2)}
+.btn-danger:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(244,63,94,.3)}
+.btn-secondary{background:#1a1f2e;color:var(--text);border:1px solid var(--border);width:100%;margin-top:10px}
+.btn-secondary:hover{border-color:var(--accent);background:rgba(124,58,237,.05)}
+.btn:disabled{opacity:.4;cursor:not-allowed;transform:none!important}
+.progress-bar{width:100%;height:8px;background:#1a1f2e;border-radius:4px;overflow:hidden;margin-top:10px}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:4px;transition:width .6s cubic-bezier(.4,0,.2,1);width:0%}
+.status-dot{width:10px;height:10px;border-radius:50%;display:inline-block;margin-right:8px;box-shadow:0 0 8px currentColor}
+.status-dot.idle{background:var(--muted);color:var(--muted)}
+.status-dot.training{background:var(--yellow);color:var(--yellow);animation:pulse 2s infinite}
+.status-dot.finished{background:var(--green);color:var(--green)}
+.status-dot.error{background:var(--red);color:var(--red)}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.1)}}
+.status-bar{display:flex;align-items:center;font-size:13px;padding:14px 18px;background:#1a1f2e;border-radius:12px;margin-bottom:14px;border:1px solid var(--border)}
+.log-box{background:#0d0f14;border:1px solid var(--border);border-radius:12px;padding:16px;font-family:'JetBrains Mono','Fira Code',monospace;font-size:11.5px;line-height:1.8;max-height:340px;overflow-y:auto;white-space:pre-wrap;color:#94a3b8}
+.metrics-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.metric-card{background:linear-gradient(135deg,#1a1f2e,#131620);border:1px solid var(--border);border-radius:12px;padding:16px;text-align:center;transition:all .2s}
+.metric-card:hover{border-color:var(--accent);transform:translateY(-2px)}
+.metric-card .value{font-size:24px;font-weight:800;background:linear-gradient(135deg,var(--accent2),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.metric-card .label{font-size:10px;color:var(--muted);margin-top:4px;text-transform:uppercase;letter-spacing:0.5px;font-weight:600}
+.chart-container{position:relative;height:280px;margin-top:12px}
+.table-wrap{overflow-x:auto;margin-top:12px;border-radius:12px;border:1px solid var(--border)}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{text-align:left;padding:12px 14px;border-bottom:2px solid var(--border);color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;font-size:10px}
+td{padding:10px 14px;border-bottom:1px solid #1a1f2e}
+tr:hover td{background:rgba(124,58,237,.05)}
+.tabs{display:flex;gap:6px;margin-bottom:16px;padding:4px;background:#1a1f2e;border-radius:12px;border:1px solid var(--border)}
+.tab{padding:10px 20px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;background:transparent;color:var(--muted);border:none;transition:all .2s;text-transform:uppercase;letter-spacing:0.5px}
+.tab.active{background:linear-gradient(135deg,var(--accent),#9333ea);color:#fff;box-shadow:0 2px 10px rgba(124,58,237,.3)}
+.tab:hover:not(.active){color:var(--text);background:rgba(124,58,237,.1)}
+.tab-content{display:none}
+.tab-content.active{display:block}
+.cm-box{font-family:'JetBrains Mono',monospace;font-size:11px;line-height:1.7;white-space:pre;overflow-x:auto;padding:14px;background:#0d0f14;border-radius:12px;border:1px solid var(--border)}
+.drop-zone{border:2px dashed var(--border);border-radius:14px;padding:36px 24px;text-align:center;color:var(--muted);cursor:pointer;transition:all .3s;margin-top:10px;background:rgba(26,31,46,.5)}
+.drop-zone:hover,.drop-zone.dragover{border-color:var(--accent);background:rgba(124,58,237,.08);color:var(--text);transform:scale(1.02)}
+.drop-zone input{display:none}
+.preview-img{max-width:100%;max-height:200px;border-radius:12px;margin-top:12px;box-shadow:0 4px 20px rgba(0,0,0,.4)}
+.prediction-bar{display:flex;align-items:center;gap:10px;margin:6px 0;padding:8px;background:#1a1f2e;border-radius:8px}
+.prediction-bar .bar{flex:1;height:24px;background:#0d0f14;border-radius:6px;overflow:hidden}
+.prediction-bar .fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:6px;transition:width .5s cubic-bezier(.4,0,.2,1)}
+.prediction-bar .lbl{font-size:12px;min-width:90px;font-weight:600}
+.prediction-bar .pct{font-size:12px;min-width:50px;text-align:right;color:var(--accent2);font-weight:700}
+.dataset-badge{display:inline-block;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;margin-top:8px;text-transform:uppercase;letter-spacing:0.5px}
+.dataset-badge.synthetic{background:#1a1f2e;color:var(--muted);border:1px solid var(--border)}
+.dataset-badge.folder{background:rgba(16,185,129,.1);color:var(--green);border:1px solid rgba(16,185,129,.3)}
+.feature-list{list-style:none;padding:0;margin:12px 0}
+.feature-list li{padding:6px 0;font-size:12px;color:var(--muted);display:flex;align-items:center;gap:8px}
+.feature-list li::before{content:'✓';color:var(--green);font-weight:700}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <h1>Zabi Network</h1>
+    <span class="badge">AI Vision Platform</span>
+  </div>
+</div>
+
+<div class="container">
+<div class="grid">
+
+<!-- LEFT SIDEBAR -->
+<div>
+  <div class="card">
+    <h2>Configuration</h2>
+    <ul class="feature-list">
+      <li>Custom architecture tuning</li>
+      <li>Real-time training metrics</li>
+      <li>Multi-GPU support ready</li>
+    </ul>
+    <div class="row">
+      <div><label>Epochs</label><input type="number" id="epochs" value="10" min="1"></div>
+      <div><label>Batch Size</label><input type="number" id="batch_size" value="32" min="1"></div>
+    </div>
+    <div class="row">
+      <div><label>Learning Rate</label><input type="number" id="lr" value="0.001" step="0.0001" min="0"></div>
+      <div><label>Optimizer</label>
+        <select id="optimizer"><option>adamw</option><option>adam</option><option>sgd</option><option>rmsprop</option></select>
+      </div>
+    </div>
+    <div class="row">
+      <div><label>Loss Function</label>
+        <select id="loss_fn"><option value="focal">Focal Loss</option><option value="label_smoothing_ce">Label Smoothing CE</option><option value="cross_entropy">Cross Entropy</option></select>
+      </div>
+      <div><label>Scheduler</label>
+        <select id="scheduler"><option value="cosine_warm_restarts">Cosine Warm Restarts</option><option value="cosine">Cosine Annealing</option><option value="step">Step LR</option></select>
+      </div>
+    </div>
+    <label>Number of Classes</label><input type="number" id="num_classes" value="10" min="2">
+    <div class="row">
+      <div><label>Training Samples</label><input type="number" id="train_samples" value="5000" min="10"></div>
+      <div><label>Validation Samples</label><input type="number" id="val_samples" value="1000" min="10"></div>
+    </div>
+    <label>Test Samples</label><input type="number" id="test_samples" value="1000" min="10">
+
+    <button class="btn btn-primary" id="btnTrain" onclick="startTraining()">Start Training</button>
+    <button class="btn btn-danger" id="btnStop" onclick="stopTraining()" disabled>Stop Training</button>
+    <button class="btn btn-secondary" onclick="runProfile()">Profile Model</button>
+  </div>
+
+  <div class="card">
+    <h2>Model Summary</h2>
+    <div id="modelSummary" class="log-box" style="max-height:200px;font-size:11px">No model loaded yet.</div>
+  </div>
+
+  <div class="card">
+    <h2>Your Images (Dataset)</h2>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:8px">Upload images to train on. Put different categories in separate uploads with different class names.</p>
+    <label>Class Name</label>
+    <input type="text" id="uploadClassName" placeholder="e.g. cats, dogs, cars..." value="">
+    <div class="drop-zone" id="datasetDropZone" onclick="document.getElementById('datasetFileInput').click()">
+      <input type="file" id="datasetFileInput" multiple accept="image/*">
+      Drop images here or click to browse
+    </div>
+    <div id="datasetStatus" style="margin-top:8px"></div>
+    <div style="margin-top:6px;font-size:11px;color:var(--muted)">Or point to a folder on your computer:</div>
+    <div style="display:flex;gap:6px;margin-top:4px">
+      <input type="text" id="datasetFolder" placeholder="/path/to/images/folder" style="flex:1">
+      <button class="btn btn-secondary" style="width:auto;margin-top:0;padding:6px 12px" onclick="setDatasetFolder()">Set</button>
+    </div>
+    <div id="datasetInfo" style="margin-top:8px"></div>
+  </div>
+
+  <div class="card">
+    <h2>Predict (Upload an Image)</h2>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:8px">Train first, then upload an image here to see what the model thinks it is.</p>
+    <div class="drop-zone" id="predictDropZone" onclick="document.getElementById('predictFileInput').click()">
+      <input type="file" id="predictFileInput" accept="image/*">
+      Drop an image here or click to browse
+    </div>
+    <div id="predictPreview" style="text-align:center"></div>
+    <div id="predictResults" style="margin-top:10px"></div>
+  </div>
+</div>
+
+<!-- RIGHT MAIN AREA -->
+<div>
+  <div class="card">
+    <div class="status-bar">
+      <span class="status-dot idle" id="statusDot"></span>
+      <span id="statusText">Idle</span>
+      <span style="margin-left:auto;font-size:12px;color:var(--muted)" id="progressText">0%</span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+  </div>
+
+  <div class="card">
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab('charts')">Charts</div>
+      <div class="tab" onclick="switchTab('metrics')">Metrics</div>
+      <div class="tab" onclick="switchTab('table')">Epoch Table</div>
+      <div class="tab" onclick="switchTab('test')">Test Results</div>
+      <div class="tab" onclick="switchTab('logs')">Logs</div>
+    </div>
+
+    <div class="tab-content active" id="tab-charts">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div><h2 style="margin-bottom:4px">Loss</h2><div class="chart-container"><canvas id="lossChart"></canvas></div></div>
+        <div><h2 style="margin-bottom:4px">Accuracy & F1</h2><div class="chart-container"><canvas id="accChart"></canvas></div></div>
+      </div>
+    </div>
+
+    <div class="tab-content" id="tab-metrics">
+      <div class="metrics-grid" id="metricsGrid">
+        <div class="metric-card"><div class="value" id="mLoss">--</div><div class="label">Val Loss</div></div>
+        <div class="metric-card"><div class="value" id="mAcc">--</div><div class="label">Val Accuracy</div></div>
+        <div class="metric-card"><div class="value" id="mF1">--</div><div class="label">Val F1</div></div>
+        <div class="metric-card"><div class="value" id="mPrec">--</div><div class="label">Val Precision</div></div>
+        <div class="metric-card"><div class="value" id="mRec">--</div><div class="label">Val Recall</div></div>
+        <div class="metric-card"><div class="value" id="mEpoch">--</div><div class="label">Epoch</div></div>
+      </div>
+    </div>
+
+    <div class="tab-content" id="tab-table">
+      <div class="table-wrap">
+        <table id="epochTable">
+          <thead><tr><th>Epoch</th><th>Train Loss</th><th>Train Acc</th><th>Train F1</th><th>Val Loss</th><th>Val Acc</th><th>Val F1</th></tr></thead>
+          <tbody id="epochBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="tab-content" id="tab-test">
+      <div class="metrics-grid" id="testGrid" style="margin-bottom:14px"></div>
+      <h2 style="margin:10px 0 6px">Confusion Matrix</h2>
+      <div class="cm-box" id="confMatrix">Run training to see test results.</div>
+    </div>
+
+    <div class="tab-content" id="tab-logs">
+      <div class="log-box" id="logBox" style="max-height:450px"></div>
+    </div>
+  </div>
+</div>
+
+</div>
+</div>
+
+<script>
+let lossChart, accChart;
+let pollInterval = null;
+let logOffset = 0;
+
+function initCharts(){
+  const common = {responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#94a3b8',font:{size:11}}}},scales:{x:{ticks:{color:'#64748b',font:{size:10}},grid:{color:'#1f2230'}},y:{ticks:{color:'#64748b',font:{size:10}},grid:{color:'#1f2230'}}}};
+  lossChart = new Chart(document.getElementById('lossChart'),{type:'line',data:{labels:[],datasets:[{label:'Train Loss',data:[],borderColor:'#6c63ff',backgroundColor:'rgba(108,99,255,.1)',tension:.3,pointRadius:2},{label:'Val Loss',data:[],borderColor:'#00d2ff',backgroundColor:'rgba(0,210,255,.1)',tension:.3,pointRadius:2}]},options:common});
+  accChart = new Chart(document.getElementById('accChart'),{type:'line',data:{labels:[],datasets:[{label:'Train Acc',data:[],borderColor:'#22c55e',tension:.3,pointRadius:2},{label:'Val Acc',data:[],borderColor:'#eab308',tension:.3,pointRadius:2},{label:'Val F1',data:[],borderColor:'#f472b6',tension:.3,pointRadius:2}]},options:common});
+}
+
+function switchTab(name){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('tab-'+name).classList.add('active');
+}
+
+function startTraining(){
+  const body = {
+    epochs: +document.getElementById('epochs').value,
+    batch_size: +document.getElementById('batch_size').value,
+    learning_rate: +document.getElementById('lr').value,
+    num_train_samples: +document.getElementById('train_samples').value,
+    num_val_samples: +document.getElementById('val_samples').value,
+    num_test_samples: +document.getElementById('test_samples').value,
+  };
+  lossChart.data.labels=[];lossChart.data.datasets.forEach(d=>d.data=[]);lossChart.update();
+  accChart.data.labels=[];accChart.data.datasets.forEach(d=>d.data=[]);accChart.update();
+  document.getElementById('epochBody').innerHTML='';
+  document.getElementById('logBox').textContent='';
+  logOffset=0;
+  fetch('/api/train',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)})
+    .then(r=>r.json()).then(d=>{
+      if(d.ok){
+        document.getElementById('btnTrain').disabled=true;
+        document.getElementById('btnStop').disabled=false;
+        startPolling();
+      }else alert(d.error);
+    });
+}
+
+function stopTraining(){
+  fetch('/api/stop',{method:'POST'});
+  document.getElementById('btnStop').disabled=true;
+}
+
+function startPolling(){
+  if(pollInterval) clearInterval(pollInterval);
+  pollInterval=setInterval(poll,1500);
+}
+
+function poll(){
+  fetch('/api/status').then(r=>r.json()).then(d=>{
+    const dot=document.getElementById('statusDot');
+    dot.className='status-dot '+d.status;
+    document.getElementById('statusText').textContent=d.status.charAt(0).toUpperCase()+d.status.slice(1)+(d.status==='training'?` (Epoch ${d.current_epoch}/${d.total_epochs})`:'');
+    document.getElementById('progressFill').style.width=d.progress+'%';
+    document.getElementById('progressText').textContent=Math.round(d.progress)+'%';
+    if(d.model_summary) document.getElementById('modelSummary').textContent=d.model_summary;
+
+    const m=d.epoch_metrics;
+    if(m.length){
+      const last=m[m.length-1];
+      document.getElementById('mLoss').textContent=last.val_loss.toFixed(4);
+      document.getElementById('mAcc').textContent=(last.val_accuracy*100).toFixed(1)+'%';
+      document.getElementById('mF1').textContent=last.val_f1.toFixed(4);
+      document.getElementById('mPrec').textContent=last.val_precision.toFixed(4);
+      document.getElementById('mRec').textContent=last.val_recall.toFixed(4);
+      document.getElementById('mEpoch').textContent=last.epoch;
+
+      lossChart.data.labels=m.map(x=>x.epoch);
+      lossChart.data.datasets[0].data=m.map(x=>x.train_loss);
+      lossChart.data.datasets[1].data=m.map(x=>x.val_loss);
+      lossChart.update();
+      accChart.data.labels=m.map(x=>x.epoch);
+      accChart.data.datasets[0].data=m.map(x=>x.train_accuracy);
+      accChart.data.datasets[1].data=m.map(x=>x.val_accuracy);
+      accChart.data.datasets[2].data=m.map(x=>x.val_f1);
+      accChart.update();
+
+      const tbody=document.getElementById('epochBody');
+      tbody.innerHTML=m.map(r=>`<tr><td>${r.epoch}</td><td>${r.train_loss.toFixed(4)}</td><td>${(r.train_accuracy*100).toFixed(1)}%</td><td>${r.train_f1.toFixed(4)}</td><td>${r.val_loss.toFixed(4)}</td><td>${(r.val_accuracy*100).toFixed(1)}%</td><td>${r.val_f1.toFixed(4)}</td></tr>`).join('');
+    }
+
+    if(d.test_metrics && d.test_metrics.test_loss!==undefined){
+      const t=d.test_metrics;
+      document.getElementById('testGrid').innerHTML=Object.entries(t).filter(([k])=>k!=='confusion_matrix').map(([k,v])=>`<div class="metric-card"><div class="value">${typeof v==='number'?(k.includes('acc')?(v*100).toFixed(1)+'%':v.toFixed(4)):v}</div><div class="label">${k.replace(/_/g,' ')}</div></div>`).join('');
+      if(t.confusion_matrix) document.getElementById('confMatrix').textContent=t.confusion_matrix;
+    }
+
+    if(d.status==='finished'||d.status==='error'||d.status==='idle'){
+      clearInterval(pollInterval);pollInterval=null;
+      document.getElementById('btnTrain').disabled=false;
+      document.getElementById('btnStop').disabled=true;
+    }
+  });
+
+  fetch('/api/logs?start='+logOffset).then(r=>r.json()).then(d=>{
+    if(d.logs.length){
+      const box=document.getElementById('logBox');
+      box.textContent+=d.logs.join('\n')+'\n';
+      logOffset+=d.logs.length;
+      box.scrollTop=box.scrollHeight;
+    }
+  });
+}
+
+function runProfile(){
+  fetch('/api/profile',{method:'POST'}).then(r=>r.json()).then(d=>{
+    let txt='PROFILE RESULTS\n'+'='.repeat(40)+'\n';
+    for(const[k,v] of Object.entries(d.param_counts)) txt+=`  ${k}: ${v.toLocaleString()} params\n`;
+    txt+=`\n  Forward time: ${d.forward_time_ms} ms (batch=${d.batch_size})\n  Output shape: [${d.output_shape}]\n`;
+    document.getElementById('modelSummary').textContent=txt;
+  });
+}
+
+initCharts();
+
+// --- Dataset upload ---
+const dsZone = document.getElementById('datasetDropZone');
+const dsInput = document.getElementById('datasetFileInput');
+['dragenter','dragover'].forEach(e=>dsZone.addEventListener(e,ev=>{ev.preventDefault();dsZone.classList.add('dragover')}));
+['dragleave','drop'].forEach(e=>dsZone.addEventListener(e,ev=>{ev.preventDefault();dsZone.classList.remove('dragover')}));
+dsZone.addEventListener('drop', ev=>{
+  const files = ev.dataTransfer.files;
+  if(files.length) uploadDatasetFiles(files);
+});
+dsInput.addEventListener('change', ()=>{if(dsInput.files.length) uploadDatasetFiles(dsInput.files);});
+
+function uploadDatasetFiles(files){
+  const className = document.getElementById('uploadClassName').value.trim() || 'default';
+  const fd = new FormData();
+  fd.append('class_name', className);
+  for(let f of files) fd.append('images', f);
+  document.getElementById('datasetStatus').innerHTML='<span style="color:var(--yellow)">Uploading '+files.length+' images...</span>';
+  fetch('/api/upload-images',{method:'POST',body:fd}).then(r=>r.json()).then(d=>{
+    if(d.ok){
+      document.getElementById('datasetStatus').innerHTML='<span style="color:var(--green)">Uploaded '+d.saved+' images to "'+d.class+'". Total: '+d.total_images+' images across '+d.num_classes+' classes.</span>';
+      refreshDatasetInfo();
+    } else {
+      document.getElementById('datasetStatus').innerHTML='<span style="color:var(--red)">'+d.error+'</span>';
+    }
+  });
+}
+
+function setDatasetFolder(){
+  const folder = document.getElementById('datasetFolder').value.trim();
+  fetch('/api/set-dataset-folder',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({folder})}).then(r=>r.json()).then(d=>{
+    if(d.ok){
+      document.getElementById('datasetInfo').innerHTML=d.num_images
+        ? '<span class="dataset-badge folder">Folder: '+d.num_images+' images, '+d.num_classes+' classes ('+d.classes.join(', ')+')</span>'
+        : '<span class="dataset-badge synthetic">Synthetic data (folder cleared)</span>';
+    } else {
+      document.getElementById('datasetInfo').innerHTML='<span style="color:var(--red)">'+d.error+'</span>';
+    }
+  });
+}
+
+function refreshDatasetInfo(){
+  fetch('/api/dataset-info').then(r=>r.json()).then(d=>{
+    if(d.source==='folder'){
+      document.getElementById('datasetInfo').innerHTML='<span class="dataset-badge folder">'+d.num_images+' images, '+d.num_classes+' classes ('+d.classes.join(', ')+')</span>';
+    } else {
+      document.getElementById('datasetInfo').innerHTML='<span class="dataset-badge synthetic">Using synthetic data</span>';
+    }
+  });
+}
+refreshDatasetInfo();
+
+// --- Predict ---
+const predZone = document.getElementById('predictDropZone');
+const predInput = document.getElementById('predictFileInput');
+['dragenter','dragover'].forEach(e=>predZone.addEventListener(e,ev=>{ev.preventDefault();predZone.classList.add('dragover')}));
+['dragleave','drop'].forEach(e=>predZone.addEventListener(e,ev=>{ev.preventDefault();predZone.classList.remove('dragover')}));
+predZone.addEventListener('drop', ev=>{
+  const files = ev.dataTransfer.files;
+  if(files.length) predictImage(files[0]);
+});
+predInput.addEventListener('change', ()=>{if(predInput.files.length) predictImage(predInput.files[0]);});
+
+function predictImage(file){
+  const fd = new FormData();
+  fd.append('image', file);
+  document.getElementById('predictResults').innerHTML='<span style="color:var(--yellow)">Analyzing...</span>';
+  document.getElementById('predictPreview').innerHTML='';
+  fetch('/api/predict',{method:'POST',body:fd}).then(r=>r.json()).then(d=>{
+    if(d.ok){
+      document.getElementById('predictPreview').innerHTML='<img class="preview-img" src="'+d.image_data+'">';
+      let html='';
+      for(const p of d.predictions){
+        html+='<div class="prediction-bar"><span class="lbl">'+p.class_name+'</span><div class="bar"><div class="fill" style="width:'+p.confidence+'%"></div></div><span class="pct">'+p.confidence+'%</span></div>';
+      }
+      document.getElementById('predictResults').innerHTML=html;
+    } else {
+      document.getElementById('predictResults').innerHTML='<span style="color:var(--red)">'+d.error+'</span>';
+    }
+  });
+}
+</script>
+</body>
+</html>

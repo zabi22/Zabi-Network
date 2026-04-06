@@ -1,0 +1,101 @@
+seed: 42
+experiment_name: hybrid_net_default
+
+model:
+  num_classes: 10
+  input_channels: 3
+  input_height: 32
+  input_width: 32
+  cnn_channels: [64, 128, 256]
+  cnn_kernel_sizes: [3, 3, 3]
+  cnn_strides: [1, 1, 1]
+  cnn_padding: [1, 1, 1]
+  cnn_pool_sizes: [2, 2, 2]
+  rnn_type: lstm
+  rnn_hidden_size: 256
+  rnn_num_layers: 2
+  rnn_bidirectional: true
+  rnn_dropout: 0.1
+  attn_embed_dim: 256
+  attn_num_heads: 8
+  attn_num_layers: 4
+  attn_ff_dim: 1024
+  attn_dropout: 0.1
+  attn_use_gating: true
+  use_residual: true
+  global_dropout: 0.2
+  width_multiplier: 1.0
+  depth_multiplier: 1.0
+  conditional_execution: false
+  conditional_threshold: 0.5
+
+data:
+  dataset_type: synthetic
+  data_dir: ./data
+  num_train_samples: 50000
+  num_val_samples: 10000
+  num_test_samples: 10000
+  batch_size: 128
+  num_workers: 4
+  pin_memory: true
+  prefetch_factor: 2
+  persistent_workers: true
+  augmentation: true
+  augmentation_strength: 0.5
+
+train:
+  epochs: 100
+  optimizer: adamw
+  learning_rate: 0.001
+  weight_decay: 0.0001
+  momentum: 0.9
+  betas: [0.9, 0.999]
+  eps: 0.00000001
+  scheduler: cosine_warm_restarts
+  scheduler_t0: 10
+  scheduler_t_mult: 2
+  scheduler_eta_min: 0.000001
+  warmup_epochs: 5
+  warmup_start_lr: 0.0000001
+  gradient_clip_norm: 1.0
+  gradient_clip_value: null
+  mixed_precision: true
+  label_smoothing: 0.1
+  loss_fn: focal
+  focal_gamma: 2.0
+  focal_alpha: null
+  accumulation_steps: 1
+
+distributed:
+  enabled: false
+  backend: nccl
+  world_size: 1
+  rank: 0
+  local_rank: 0
+  init_method: "env://"
+  use_data_parallel: true
+
+checkpoint:
+  save_dir: ./checkpoints
+  save_every: 5
+  keep_last: 3
+  save_best: true
+  resume: null
+
+log:
+  log_dir: ./logs
+  log_every: 50
+  use_tensorboard: true
+  print_model_summary: true
+  profile: false
+  gradient_inspection: false
+  activation_stats: false
+  plot_curves: true
+
+nas:
+  enabled: false
+  search_space_channels: [32, 64, 128, 256]
+  search_space_layers: [1, 2, 3, 4]
+  search_space_heads: [2, 4, 8]
+  search_space_rnn: [lstm, gru]
+  max_trials: 20
