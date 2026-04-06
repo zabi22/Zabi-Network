@@ -54,7 +54,6 @@ pip install -r requirements.txt
 python app.py
 ```
 
-Open **[http://127.0.0.1:5000](http://127.0.0.1:5000)** in your browser.
 
 ---
 
@@ -96,6 +95,23 @@ The model combines three types of neural networks:
 All core components (layer normalization, dropout, multi-head attention) are implemented **from scratch** without relying on high-level PyTorch modules. This gives you full control and deeper understanding of how everything works under the hood.
 
 ---
+## 👨‍💻 About Me
+
+Hi, I’m **Zabihullah Ahmadzai**, a 15-year-old developer.
+
+I’m passionate about **Artificial Intelligence, programming, and cybersecurity**, and I spend most of my time learning by building real projects and exploring how systems work at a deeper level. I enjoy solving problems, experimenting with new ideas, and turning concepts into working applications.
+
+At school, I’m often the person others turn to for help with technology, and outside of school I continuously push myself to improve my skills by working on projects like this one.
+
+### 🚀 Interests
+- 🤖 Artificial Intelligence and machine learning  
+- 🧠 System design and how complex systems are built  
+- 🔐 Cybersecurity and building secure, reliable applications  
+
+### 🎯 Goal
+My goal is to keep developing my skills, work on more advanced systems, and eventually contribute to real-world technology and innovation.
+
+---
 
 ## 🎓 Training Options
 
@@ -106,3 +122,5 @@ You can train on:
 
 
 <p align="center">Made with 🔥 and PyTorch</p>
+
+
