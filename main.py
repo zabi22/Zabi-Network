@@ -6,11 +6,11 @@ from typing import Dict, List
 
 import torch
 
-from config import ExperimentConfig, ModelConfig, load_config_from_cli
-from data import build_dataloaders
-from model import build_model
-from trainer import Trainer
-from utils import plot_training_curves, set_seed
+from core.config import ExperimentConfig, ModelConfig, load_config_from_cli
+from src.data import build_dataloaders
+from src.model import build_model
+from core.trainer import Trainer
+from core.utils import plot_training_curves, set_seed
 
 
 def run_train(cfg: ExperimentConfig) -> None:

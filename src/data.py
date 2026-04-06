@@ -10,7 +10,7 @@ from torch import Tensor
 from torch.utils.data import Dataset, DataLoader, DistributedSampler
 from PIL import Image
 
-from config import DataConfig
+from core.config import DataConfig
 
 
 class SyntheticImageDataset(Dataset):

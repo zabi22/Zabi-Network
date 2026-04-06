@@ -10,7 +10,7 @@ import torch
 import torch.nn as nn
 from torch import Tensor
 
-from config import CheckpointConfig, LogConfig
+from core.config import CheckpointConfig, LogConfig
 
 
 class CheckpointManager:

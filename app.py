@@ -4,6 +4,7 @@ import io
 import json
 import base64
 import os
+import sys
 import threading
 import time
 import traceback
@@ -11,16 +12,19 @@ from dataclasses import asdict
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
+# Add project root to path so imports work
+sys.path.insert(0, os.path.dirname(__file__))
+
 import torch
 import torch.nn.functional as F
 from flask import Flask, render_template, request, jsonify, Response
 
-from config import ExperimentConfig
-from data import build_dataloaders, build_folder_dataloaders, load_single_image, FolderImageDataset
-from losses import build_loss_fn, ConditionalGateLoss
-from metrics import MetricsAccumulator
-from model import build_model, HybridNet
-from utils import set_seed, get_device, GradientInspector
+from core.config import ExperimentConfig
+from src.data import build_dataloaders, build_folder_dataloaders, load_single_image, FolderImageDataset
+from core.losses import build_loss_fn, ConditionalGateLoss
+from core.metrics import MetricsAccumulator
+from src.model import build_model, HybridNet
+from core.utils import set_seed, get_device, GradientInspector
 
 app = Flask(__name__)
 UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), "uploads")
@@ -515,4 +519,4 @@ def predict():
 
 
 if __name__ == "__main__":
-    app.run(debug=False, host="127.0.0.1", port=5000)
+    app.run(debug=False, host="0.0.0.0", port=5000)

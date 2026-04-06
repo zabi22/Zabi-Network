@@ -9,10 +9,10 @@ import torch.nn as nn
 from torch import Tensor
 from torch.utils.data import DataLoader
 
-from config import ExperimentConfig
-from losses import ConditionalGateLoss, build_loss_fn
-from metrics import MetricsAccumulator
-from utils import (
+from core.config import ExperimentConfig
+from core.losses import ConditionalGateLoss, build_loss_fn
+from core.metrics import MetricsAccumulator
+from core.utils import (
     CheckpointManager,
     TrainingLogger,
     GradientInspector,

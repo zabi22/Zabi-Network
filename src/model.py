@@ -8,7 +8,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch import Tensor
 
-from layers import (
+from core.layers import (
     ConvBlock,
     RecurrentEncoder,
     TransformerEncoderBlock,
@@ -17,7 +17,7 @@ from layers import (
     ManualDropout,
     ConditionalExecutionGate,
 )
-from config import ModelConfig
+from core.config import ModelConfig
 
 
 class CNNFeatureExtractor(nn.Module):
