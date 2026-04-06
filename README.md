@@ -11,7 +11,6 @@
   </a>
   <img src="https://img.shields.io/badge/Python-3.9%2B-06b6d4?style=for-the-badge&logo=python" alt="Python"/>
   <img src="https://img.shields.io/badge/PyTorch-2.0%2B-ee4c2c?style=for-the-badge&logo=pytorch" alt="PyTorch"/>
-  <img src="https://img.shields.io/badge/License-MIT-green?style=for-the-badge" alt="License"/>
 </p>
 
 <p align="center">
